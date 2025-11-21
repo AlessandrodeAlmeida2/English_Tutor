@@ -1,0 +1,7 @@
+{
+  "name": "FluentAI Tutor",
+  "description": "An intelligent English tutor that helps you practice conversation, corrects grammar/pronunciation, and teaches you to sound like a native speaker.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
