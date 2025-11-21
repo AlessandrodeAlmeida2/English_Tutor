@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { GeminiLiveService } from './services/geminiLiveService';
 import { ConnectionState, TranscriptionItem } from './types';
@@ -72,14 +71,16 @@ const App: React.FC = () => {
       return;
     }
 
-    if (!process.env.API_KEY) {
-        setError("API Key is missing in environment.");
+    // Ensure process.env exists (handled by index.html polyfill) but check for the key
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+        setError("API Key missing. Please add 'API_KEY' to your Vercel Environment Variables.");
         return;
     }
 
     setError(null);
     const client = new GeminiLiveService(
-      process.env.API_KEY,
+      apiKey,
       handleTranscript,
       setConnectionState,
       setVolume

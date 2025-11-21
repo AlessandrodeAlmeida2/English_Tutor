@@ -20,6 +20,12 @@
           scrollbar-width: none;  /* Firefox */
       }
     </style>
+    <!-- Polyfill process for browser environments (Vercel/Netlify) to prevent ReferenceError -->
+    <script>
+      if (typeof process === 'undefined') {
+        window.process = { env: {} };
+      }
+    </script>
   <script type="importmap">
 {
   "imports": {
