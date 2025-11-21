@@ -41,24 +41,27 @@ const App: React.FC = () => {
   const handleTranscript = useCallback((text: string, role: 'user' | 'model', isComplete: boolean) => {
     setTranscripts(prev => {
       const lastItem = prev[prev.length - 1];
-      // If the last item is from the same role and not complete, update it
-      // But Gemini streams text chunks, so we might want to just replace the last one if it matches the role and is "pending"
-      // However, live API often sends distinct chunks. 
-      // Strategy: Use a unique ID for "current turn".
       
+      // Performance Fix: Stable IDs
+      // If the last item is from the same role and pending, update it INSTEAD of creating a new one.
+      // This prevents "DOM Thrashing" where the chat bubble is destroyed/recreated on every letter.
+      if (lastItem && lastItem.role === role && !lastItem.isComplete) {
+         const updated = [...prev];
+         updated[updated.length - 1] = {
+           ...lastItem,
+           text,
+           isComplete
+         };
+         return updated;
+      }
+      
+      // New message turn
       const newItem: TranscriptionItem = {
         id: Date.now().toString(),
         role,
         text,
         isComplete
       };
-
-      if (lastItem && lastItem.role === role && !lastItem.isComplete) {
-         // Update existing pending message
-         const updated = [...prev];
-         updated[updated.length - 1] = newItem;
-         return updated;
-      }
       
       return [...prev, newItem];
     });
@@ -127,8 +130,8 @@ const App: React.FC = () => {
             </div>
         )}
         
-        {transcripts.map((t, idx) => (
-            <MessageItem key={idx} item={t} />
+        {transcripts.map((t) => (
+            <MessageItem key={t.id} item={t} />
         ))}
         <div ref={messagesEndRef} />
       </main>

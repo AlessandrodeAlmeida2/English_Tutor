@@ -5,7 +5,9 @@ interface MessageItemProps {
   item: TranscriptionItem;
 }
 
-const MessageItem: React.FC<MessageItemProps> = ({ item }) => {
+// Using React.memo is critical for performance in streaming chat apps.
+// It prevents old messages from re-rendering when a new token arrives.
+const MessageItem: React.FC<MessageItemProps> = React.memo(({ item }) => {
   const isUser = item.role === 'user';
   
   return (
@@ -28,6 +30,10 @@ const MessageItem: React.FC<MessageItemProps> = ({ item }) => {
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Only re-render if the text content or completion status changes
+  return prevProps.item.text === nextProps.item.text && 
+         prevProps.item.isComplete === nextProps.item.isComplete;
+});
 
 export default MessageItem;
